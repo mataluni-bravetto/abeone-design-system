@@ -101,7 +101,6 @@ export function getOrbitalSystemCode(config: AnimationPatternConfig = {}): strin
   const {
     particleCount = 10,
     speed = 0.02,
-    color = 'rgba(255, 105, 180, 200)',
   } = config;
 
   return `

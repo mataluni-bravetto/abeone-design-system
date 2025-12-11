@@ -48,6 +48,36 @@ export interface LivingCanvasConfig {
   title?: string;
 }
 
+/**
+ * Sanitize HTML content to prevent XSS
+ */
+function sanitizeHTML(str: string): string {
+  const div = typeof document !== 'undefined' ? document.createElement('div') : null;
+  if (div) {
+    div.textContent = str;
+    return div.innerHTML;
+  }
+  // Fallback for Node.js environments
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
+/**
+ * Escape HTML attributes
+ */
+function escapeAttribute(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 export class LivingCanvasBuilder {
   /**
    * Create a Living Canvas HTML file
@@ -56,6 +86,19 @@ export class LivingCanvasBuilder {
     toHTML: () => string;
     validate: () => { valid: boolean; errors: string[] };
   } {
+    // Validate config
+    if (!config || typeof config !== 'object') {
+      throw new Error('LivingCanvasBuilder.create requires a valid config object');
+    }
+
+    if (!config.emotion || typeof config.emotion !== 'string') {
+      throw new Error('LivingCanvasBuilder.create requires an emotion string');
+    }
+
+    if (!config.content || typeof config.content !== 'object') {
+      throw new Error('LivingCanvasBuilder.create requires a content object');
+    }
+
     const {
       emotion,
       animationPattern,
@@ -78,7 +121,7 @@ export class LivingCanvasBuilder {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
+  <title>${escapeAttribute(title)}</title>
   
   <!-- CDN ONLY -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
@@ -207,8 +250,8 @@ export class LivingCanvasBuilder {
   <div class="content">
     <!-- THE HOOK -->
     <section class="section hero">
-      <h1>${content.hook.headline}</h1>
-      ${content.hook.subheadline ? `<p>${content.hook.subheadline}</p>` : ''}
+      <h1>${sanitizeHTML(content.hook.headline)}</h1>
+      ${content.hook.subheadline ? `<p>${sanitizeHTML(content.hook.subheadline)}</p>` : ''}
     </section>
     
     ${content.proof ? `
@@ -218,7 +261,7 @@ export class LivingCanvasBuilder {
       <div class="stats-grid">
         ${content.proof.stats?.map(stat => `
           <div class="stat-item">
-            <div class="stat-number">${stat}</div>
+            <div class="stat-number">${sanitizeHTML(stat)}</div>
           </div>
         `).join('') || ''}
       </div>
@@ -232,7 +275,7 @@ export class LivingCanvasBuilder {
       <ol class="steps-list">
         ${content.how.steps.map((step, i) => `
           <li>
-            <strong>Step ${i + 1}:</strong> ${step}
+            <strong>Step ${i + 1}:</strong> ${sanitizeHTML(step)}
           </li>
         `).join('')}
       </ol>
@@ -264,12 +307,12 @@ export class LivingCanvasBuilder {
   
   <script>
     // Initialize p5.js in instance mode
-    new p5(function(p) {
-      ${animationCode.replace(/function\s+(\w+)/g, 'p.$1 = function').replace(/(\w+)\(/g, (match, fn) => {
-        const p5Functions = ['setup', 'draw', 'windowResized', 'createCanvas', 'random', 'width', 'height', 'background', 'fill', 'noStroke', 'ellipse', 'stroke', 'line', 'cos', 'sin', 'TWO_PI', 'lerp', 'floor', 'push', 'pop', 'colorMode', 'HSB', 'resizeCanvas'];
-        return p5Functions.includes(fn) ? `p.${fn}(` : match;
-      })}
-    }, document.getElementById('canvas-container'));
+    (function() {
+      const sketch = function(p) {
+        ${animationCode.replace(/function\s+(setup|draw|windowResized)/g, 'p.$1 = function').replace(/\b(createCanvas|random|width|height|background|fill|noStroke|ellipse|stroke|line|cos|sin|TWO_PI|lerp|floor|push|pop|colorMode|HSB|resizeCanvas|frameCount)\b/g, 'p.$1')}
+      };
+      new p5(sketch, document.getElementById('canvas-container'));
+    })();
   </script>
 </body>
 </html>`;

@@ -17,6 +17,12 @@ export * from './animations/patterns';
 // Living Canvas Builder
 export * from './living-canvas/builder';
 
+// Utilities
+export * from './utils';
+
+// Initialization
+export * from './init';
+
 // Re-export commonly used items
 export { CosmicPalette } from './tokens/cosmic-palette';
 export { TypographySystem } from './tokens/typography';

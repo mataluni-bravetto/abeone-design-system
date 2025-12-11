@@ -12,7 +12,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "validate": "node scripts/validate.js"
+    "validate": "node scripts/validate.js",
+    "prepublishOnly": "npm run build && npm run validate",
+    "test": "echo \"Error: no test specified\" && exit 0"
   },
   "keywords": [
     "design-system",
@@ -26,7 +28,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/abeone/design-system"
+    "url": "https://github.com/mataluni-bravetto/abeone-design-system.git"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
