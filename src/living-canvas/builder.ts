@@ -263,11 +263,12 @@ export class LivingCanvasBuilder {
   </div>
   
   <script>
-    ${animationCode}
-    
     // Initialize p5.js in instance mode
     new p5(function(p) {
-      ${animationCode.split('function ').join('p.').split('function ').join('p.')}
+      ${animationCode.replace(/function\s+(\w+)/g, 'p.$1 = function').replace(/(\w+)\(/g, (match, fn) => {
+        const p5Functions = ['setup', 'draw', 'windowResized', 'createCanvas', 'random', 'width', 'height', 'background', 'fill', 'noStroke', 'ellipse', 'stroke', 'line', 'cos', 'sin', 'TWO_PI', 'lerp', 'floor', 'push', 'pop', 'colorMode', 'HSB', 'resizeCanvas'];
+        return p5Functions.includes(fn) ? `p.${fn}(` : match;
+      })}
     }, document.getElementById('canvas-container'));
   </script>
 </body>

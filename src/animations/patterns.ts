@@ -128,10 +128,10 @@ function draw() {
     let x = centerX + cos(node.angle) * node.distance;
     let y = centerY + sin(node.angle) * node.distance;
     
-    stroke(${color.replace('rgba', '').replace(')', ', 100)')});
+    stroke(255, 105, 180, 100);
     line(centerX, centerY, x, y);
     
-    fill(${color});
+    fill(255, 105, 180, 200);
     noStroke();
     ellipse(x, y, 10, 10);
   }
