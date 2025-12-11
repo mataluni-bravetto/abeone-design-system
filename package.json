@@ -1,0 +1,37 @@
+{
+  "name": "@abeone/design-system",
+  "version": "1.0.0",
+  "description": "YAGNI-approved, JØHN-validated design system for Living Canvases and digital experiences",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "docs",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "validate": "node scripts/validate.js"
+  },
+  "keywords": [
+    "design-system",
+    "living-canvas",
+    "yagni",
+    "john",
+    "abeone",
+    "radical-simplification"
+  ],
+  "author": "AbëONE",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abeone/design-system"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "p5": "^1.7.0"
+  }
+}
